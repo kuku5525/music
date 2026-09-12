@@ -1,17 +1,16 @@
-<!DOCTYPE html>
-<html lang="zh"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>曲库分级一览 · 双系统</title>
 <style>
 :root{--bg:#f6f3ec;--panel:#fffdf8;--ink:#211d16;--ink2:#6b6153;--line:#e4dccb;--gold:#a9812f;
 --s:#a9812f;--ap:#b8722a;--a:#3f7a5f;--b:#4a6a86;--c:#9a6a63;--st:#7a6f9a;--r:#8a6f3f;
---up:#3f7a5f;--dn:#9a6a63;}
+--up:#3f7a5f;--dn:#9a6a63;--track:#eae2d2;--warn:#a8512a;}
 @media(prefers-color-scheme:dark){:root{--bg:#131009;--panel:#1c1811;--ink:#efe7d6;--ink2:#a29882;--line:#2e2819;--gold:#d9b968;
 --s:#e0bd6f;--ap:#e0a05a;--a:#7cc39c;--b:#8bb3d6;--c:#d3928a;--st:#b0a3d6;--r:#c9a86a;
---up:#7cc39c;--dn:#d3928a;}}
+--up:#7cc39c;--dn:#d3928a;--track:#2a2417;--warn:#e0925f;}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
-.wrap{max-width:920px;margin:0 auto;padding:24px 16px 60px}
+.wrap{max-width:1020px;margin:0 auto;padding:24px 16px 60px}
 h1{font-family:Georgia,"Songti SC",serif;font-size:clamp(24px,5vw,38px);margin:0 0 2px;letter-spacing:-.01em}
 .sub{color:var(--ink2);font-size:13px;margin-bottom:14px}
 .seg{display:inline-flex;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:3px;gap:3px;margin-bottom:14px}
@@ -21,10 +20,12 @@ padding:8px 16px;border-radius:9px;cursor:pointer;transition:background .15s,col
 .seg button.on{background:var(--gold);color:#181205}
 .gear{color:var(--ink2);font-size:12.5px;margin:-6px 0 16px;line-height:1.6}
 .gear b{color:var(--ink);font-weight:700}
-.bar{position:sticky;top:0;background:var(--bg);padding:12px 0;z-index:5;border-bottom:1px solid var(--line)}
+.bar{position:sticky;top:0;background:var(--bg);padding:12px 0 10px;z-index:5;border-bottom:1px solid var(--line)}
 #q{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font-size:15px}
 #q:focus{outline:2px solid var(--gold);outline-offset:1px}
-.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.row2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+.seg.mini{margin:0}.seg.mini button{padding:6px 13px;font-size:12.5px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
 .chip{cursor:pointer;user-select:none;border:1px solid var(--line);background:var(--panel);color:var(--ink2);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600}
 .chip.on{color:#fff}
 .chip[data-t="ALL"].on{background:var(--gold);border-color:var(--gold);color:#181205}
@@ -32,34 +33,99 @@ padding:8px 16px;border-radius:9px;cursor:pointer;transition:background .15s,col
 .chip[data-t="A"].on{background:var(--a);border-color:var(--a)} .chip[data-t="B"].on{background:var(--b);border-color:var(--b)} .chip[data-t="C"].on{background:var(--c);border-color:var(--c)}
 .chip[data-t="R"].on{background:var(--r);border-color:var(--r)}
 .chip[data-t="SoundTest"].on{background:var(--st);border-color:var(--st)}
-.tier{margin-top:26px}
-.th{display:flex;align-items:baseline;gap:12px;padding:8px 2px;border-bottom:2px solid var(--tc);margin-bottom:4px;flex-wrap:wrap}
-.th .star{font-size:18px;color:var(--tc);letter-spacing:1px} .th .nm{font-weight:700} .th .ds{color:var(--ink2);font-size:12.5px} .th .ct{margin-left:auto;color:var(--ink2);font-size:13px}
-.tier[data-t="S"]{--tc:var(--s)}.tier[data-t="A+"]{--tc:var(--ap)}.tier[data-t="A"]{--tc:var(--a)}.tier[data-t="R"]{--tc:var(--r)}.tier[data-t="B"]{--tc:var(--b)}.tier[data-t="C"]{--tc:var(--c)}.tier[data-t="SoundTest"]{--tc:var(--st)}
-.row{display:grid;grid-template-columns:1fr auto;gap:8px 12px;padding:7px 4px;border-bottom:1px solid var(--line);align-items:baseline}
-.row .a{font-weight:600} .row .t{color:var(--ink)} .row .al{color:var(--ink2);font-size:12.5px}
-.row .meta{color:var(--ink2);font-size:11.5px;white-space:nowrap;text-align:right}
-.row .dr{display:block;font-size:10.5px;opacity:.75}
-.live{color:var(--gold);font-weight:600}
-.mv{font-size:11px;font-weight:700;margin-left:6px;white-space:nowrap}
-.mv.up{color:var(--up)} .mv.dn{color:var(--dn);opacity:.7}
-.empty{color:var(--ink2);padding:8px 4px;font-size:13px}
-.foot{margin-top:34px;color:var(--ink2);font-size:12px;text-align:center;line-height:1.7}
-</style></head>
-<body><div class="wrap">
+.chip .cdot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:0}
+.chip.on .cdot{background:#fff!important;opacity:.9}
+.status{margin-left:auto;color:var(--ink2);font-size:12.5px}
+.status b{color:var(--ink)}
+details.dir{margin-top:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+details.dir>summary{cursor:pointer;padding:9px 13px;font-size:13px;font-weight:700;color:var(--ink2);list-style:none}
+details.dir>summary::-webkit-details-marker{display:none}
+details.dir>summary::before{content:"\25B8  ";color:var(--gold)}
+details.dir[open]>summary::before{content:"\25BE  "}
+details.dir>summary:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.dirlist{display:flex;flex-wrap:wrap;gap:6px;padding:0 13px 13px;max-height:232px;overflow:auto}
+.dirlist button{appearance:none;border:1px solid var(--line);background:var(--bg);color:var(--ink2);border-radius:16px;
+padding:3px 9px;cursor:pointer;font:inherit;font-size:12px}
+.dirlist button:hover{border-color:var(--gold);color:var(--ink)}
+.dirlist button i{font-style:normal;opacity:.55;margin-left:4px}
+.ent{border:1px solid var(--line);background:var(--panel);border-radius:11px;margin-top:10px;overflow:hidden}
+.ent>summary{cursor:pointer;padding:12px 14px;list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ent>summary::-webkit-details-marker{display:none}
+.ent>summary:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.ent>summary::before{content:"\25B8";color:var(--gold);font-size:15px;line-height:1;font-weight:700;flex:none;width:13px}
+.ent[open]>summary::before{content:"\25BE"}
+.ent>summary:hover{background:var(--bg)}
+.ehead{min-width:0;flex:1 1 240px}
+.ename{font-family:Georgia,"Songti SC",serif;font-size:17px;font-weight:700;letter-spacing:-.01em}
+.esub{color:var(--ink2);font-size:12.5px}
+.espan{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tbar{display:flex;height:9px;width:132px;border-radius:3px;overflow:hidden;border:1px solid var(--line);flex:none}
+.ecnt{color:var(--ink2);font-size:12.5px;min-width:44px;text-align:right}
+.ebody{padding:0 14px 12px}
+.alb{margin-top:10px;border-top:1px solid var(--line);padding-top:9px}
+.alb:first-child{border-top:0;padding-top:2px;margin-top:2px}
+.albh{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:3px}
+.albh .an{font-weight:700;font-size:13.5px}
+.albh .ac{color:var(--ink2);font-size:12px}
+.trk{display:grid;grid-template-columns:1fr auto auto 128px;align-items:center;gap:10px;padding:5px 0;border-top:1px dashed var(--line)}
+.alb .trk:first-of-type,.ebody>.trk:first-of-type{border-top:0}
+.tt{min-width:0}
+.tt .t{font-size:14px}
+.tt .sm{color:var(--ink2);font-size:11.5px}
+.live{font-size:10.5px;border:1px solid var(--line);border-radius:4px;padding:0 4px;color:var(--ink2);vertical-align:1px}
+.tg{font-size:11.5px;font-weight:700;border-radius:5px;padding:2px 7px;color:#fff;white-space:nowrap}
+.tg[data-t="S"]{background:var(--s)}.tg[data-t="A+"]{background:var(--ap)}.tg[data-t="A"]{background:var(--a)}
+.tg[data-t="R"]{background:var(--r)}.tg[data-t="B"]{background:var(--b)}.tg[data-t="C"]{background:var(--c)}
+.tg[data-t="SoundTest"]{background:var(--st)}
+.fmt{font-size:11.5px;color:var(--ink2);white-space:nowrap}
+.fmt[data-hi="1"]{color:var(--gold);font-weight:700}
+.dr{display:flex;align-items:center;gap:7px}
+.drn{font-size:12px;color:var(--ink2);width:30px;text-align:right;flex:none}
+.meter{position:relative;flex:1;height:7px;background:var(--track);border-radius:2px;overflow:hidden;min-width:50px}
+.meter>b{position:absolute;left:0;top:0;bottom:0;background:var(--a);border-radius:2px}
+.meter>i{position:absolute;top:-2px;bottom:-2px;width:1.5px;background:var(--ink);opacity:.38}
+.meter[data-low="1"]>b{background:var(--warn)}
+.mv{font-size:11px;font-weight:700}.mv.up{color:var(--up)}.mv.dn{color:var(--dn)}
+.tier{margin-top:24px}
+.th{display:flex;align-items:baseline;gap:12px;padding:8px 2px;border-bottom:2px solid var(--tc);margin-bottom:2px;flex-wrap:wrap}
+.th .star{font-size:18px;color:var(--tc);letter-spacing:1px}.th .nm{font-weight:700}
+.th .ds{color:var(--ink2);font-size:12.5px}.th .ct{margin-left:auto;color:var(--ink2);font-size:13px}
+.tier[data-t="S"]{--tc:var(--s)}.tier[data-t="A+"]{--tc:var(--ap)}.tier[data-t="A"]{--tc:var(--a)}
+.tier[data-t="R"]{--tc:var(--r)}.tier[data-t="B"]{--tc:var(--b)}.tier[data-t="C"]{--tc:var(--c)}.tier[data-t="SoundTest"]{--tc:var(--st)}
+.empty{padding:40px 8px;text-align:center;color:var(--ink2)}
+.foot{margin-top:34px;color:var(--ink2);font-size:12px;line-height:1.7;border-top:1px solid var(--line);padding-top:12px}
+@media(max-width:700px){
+  .trk{grid-template-columns:1fr auto;row-gap:4px}
+  .trk .dr{grid-column:1/-1}
+  .espan{margin-left:0;width:100%}
+  .tbar{width:100%}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<div class="wrap">
 <h1>曲库分级一览</h1>
-<div class="sub">同一个曲库，两套排序。切换系统看各自的主场 · 共 <b id="tot"></b> 首 · 导出 2026-09-12</div>
+<div class="sub">同一个曲库，两套排序 · 共 <b id="tot"></b> 首 · 导出 2026-09-12</div>
 <div class="seg" id="seg" role="tablist">
   <button type="button" data-d="traillii" class="on" role="tab">朱鹂档</button>
   <button type="button" data-d="atrium" role="tab">Atrium 档</button>
 </div>
 <div class="gear" id="gear"></div>
 <div class="bar">
-  <input id="q" type="search" placeholder="搜艺人 / 歌名 / 专辑 / live / 24-192…（空格=且，-词=排除）" autocomplete="off">
-  <div class="chips" id="chips"></div>
+  <input id="q" type="search" placeholder="搜艺人 / 歌名 / 专辑 / live / 24-192…（空格=且，-词=排除，按 / 聚焦）" autocomplete="off">
+  <div class="row2">
+    <div class="seg mini" id="views" role="tablist">
+      <button type="button" data-v="artist" class="on" role="tab">按艺人</button>
+      <button type="button" data-v="album" role="tab">按专辑</button>
+      <button type="button" data-v="tier" role="tab">按档位</button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="status" id="status"></div>
+  </div>
 </div>
+<details class="dir" id="dir"><summary>艺人目录 · 点名字直接查他的歌</summary><div class="dirlist" id="dirlist"></div></details>
 <div id="list"></div>
 <div class="foot">数据源:本地库 tier_map.json + dr_map.json · DR=crest(Peak−RMS dB)· 分级为主观听音建议<br>
+DR 计量条刻度 6–24 dB，竖线为 11 dB 压缩线，低于线显橙色（分级里会单向降一档）<br>
 Atrium 档规则：乐队编制 Live DR≥13 或录音室 DR≥17 → A+ · 乐队 DR≥13 → A · DR&lt;10 → 救场档 · 人声 DR≥16 → A<br>
 箭头标记该曲在两档之间的升降</div>
 </div>
@@ -69,67 +135,149 @@ const META={"traillii": {"name": "朱鹂档", "gear": "墨菊 (LPGT) + Oriolus T
 const TOTAL=865;
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
 const COLL=new Intl.Collator('zh-Hans-CN',{numeric:true,sensitivity:'base'});
-const grp=a=>/^[A-Za-z0-9]/.test(a||'')?0:1;   // 英文/数字歌手在前，中文按拼音在后
+const grp=a=>/^[A-Za-z0-9]/.test(a||'')?0:1;
 const byName=(x,y)=>grp(x.a)-grp(y.a)||COLL.compare(x.a||'',y.a||'')||COLL.compare(x.t||'',y.t||'');
-const esc=s=>(s||"").replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-document.getElementById('tot').textContent=TOTAL;
+const esc=s=>(s||"").replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const TVAR={"S":"--s","A+":"--ap","A":"--a","R":"--r","B":"--b","C":"--c","SoundTest":"--st"};
+const LO=6,HI=24,LINE=11;
+const $=id=>document.getElementById(id);
+$('tot').textContent=TOTAL;
 
-let dev="traillii", activeTier="ALL", terms=[];
-// 搜索命中范围：艺人 / 歌名 / 专辑 / 规格 / live-studio / DR
+let dev="traillii", view="artist", activeTier="ALL", terms=[];
 const hay=d=>d._h||(d._h=(d.a+" "+d.t+" "+d.al+" "+d.f+" "+(d.l?"live 现场":"studio 录音室")+" dr"+(d.c==null?"":d.c)).toLowerCase());
 const hit=d=>terms.every(w=>w[0]==="-"?(w.length<2||!hay(d).includes(w.slice(1))):hay(d).includes(w));
-const chipsWrap=document.getElementById('chips');
+const M=()=>META[dev];
+const tierOf=d=>dev==="atrium"?d.t2:d.t1;
+const isHi=f=>!!f&&!/^CD /.test(f);
 
-document.getElementById('seg').addEventListener('click',e=>{
-  const b=e.target.closest('button'); if(!b) return;
-  dev=b.dataset.d; activeTier="ALL";
+$('seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  dev=b.dataset.d;activeTier="ALL";
   [...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));
-  buildChips(); paintGear(); render();
-});
+  buildChips();paintGear();render();});
+$('views').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  view=b.dataset.v;[...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));render();});
+$('q').addEventListener('input',e=>{terms=e.target.value.toLowerCase().split(/\s+/).filter(Boolean);render();});
+document.addEventListener('keydown',e=>{
+  if(e.key==="/"&&document.activeElement!==$('q')){e.preventDefault();$('q').focus();$('q').select();}});
 
-function M(){return META[dev];}
-function tierOf(d){return dev==="atrium"?d.t2:d.t1;}
-
-function paintGear(){
-  const m=M();
-  document.getElementById('gear').innerHTML=`<b>${esc(m.gear)}</b><br>${m.note}`;
-}
-function buildChips(){
-  const m=M();
-  chipsWrap.innerHTML="";
-  [["ALL","全部",TOTAL]].concat(m.order.map(t=>[t,t,m.cnt[t]||0])).forEach(([t,lab,n])=>{
-    if(t!=="ALL"&&!n&&t!=="S") return;
-    const c=el('span','chip'+(t===activeTier?' on':''),`${esc(lab)} <span style="opacity:.7">${n}</span>`);
+function paintGear(){const m=M();$('gear').innerHTML='<b>'+esc(m.gear)+'</b><br>'+m.note;}
+function buildChips(){const m=M(),w=$('chips');w.innerHTML="";
+  [["ALL","全部",TOTAL]].concat(m.order.map(t=>[t,t,m.cnt[t]||0])).forEach(function(p){
+    const t=p[0],lab=p[1],n=p[2];
+    if(t!=="ALL"&&!n&&t!=="S")return;
+    const dot=(t==="ALL")?'':'<i class="cdot" style="background:var('+TVAR[t]+')"></i>';
+    const c=el('span','chip'+(t===activeTier?' on':''),dot+esc(lab)+' <span style="opacity:.7">'+n+'</span>');
     c.dataset.t=t;
-    c.onclick=()=>{activeTier=t;[...chipsWrap.children].forEach(x=>x.classList.toggle('on',x.dataset.t===t));render();};
-    chipsWrap.appendChild(c);
-  });
+    c.onclick=function(){activeTier=t;[...w.children].forEach(x=>x.classList.toggle('on',x.dataset.t===t));render();};
+    w.appendChild(c);});}
+
+function meter(c){
+  if(c==null)return '<div class="dr"><span class="drn">—</span><span class="meter"></span></div>';
+  const p=Math.max(0,Math.min(100,(c-LO)/(HI-LO)*100)),l=(LINE-LO)/(HI-LO)*100;
+  return '<div class="dr"><span class="drn">'+c.toFixed(1)+'</span><span class="meter" data-low="'+(c<LINE?1:0)+
+    '"><b style="width:'+p+'%"></b><i style="left:'+l+'%"></i></span></div>';
 }
-document.getElementById('q').addEventListener('input',e=>{terms=e.target.value.toLowerCase().split(/\s+/).filter(Boolean);render();});
+function tbar(rows){
+  const m=M(),cnt={};rows.forEach(d=>{const t=tierOf(d);cnt[t]=(cnt[t]||0)+1;});
+  return '<span class="tbar">'+m.order.filter(t=>cnt[t]).map(t=>
+    '<span style="flex:'+cnt[t]+';background:var('+TVAR[t]+')" title="'+t+' '+cnt[t]+' 首"></span>').join('')+'</span>';
+}
+function profile(rows){
+  const hi=rows.filter(d=>isHi(d.f)).length;
+  const cs=rows.map(d=>d.c).filter(v=>v!=null).sort((a,b)=>a-b);
+  const med=cs.length?(cs.length%2?cs[(cs.length-1)/2]:(cs[cs.length/2-1]+cs[cs.length/2])/2):null;
+  const live=rows.filter(d=>d.l).length,bits=[];
+  if(live)bits.push('现场 '+live);
+  if(rows.length-live)bits.push('录音室 '+(rows.length-live));
+  bits.push('24bit '+hi+'/'+rows.length);
+  if(med!=null)bits.push('DR 中位 '+med.toFixed(1));
+  return bits.join(' · ');
+}
+function trk(d,showMeta){
+  const t=tierOf(d);let mv="";
+  if(dev==="atrium"&&d.m>0)mv=' <span class="mv up">&uarr;'+esc(d.t1)+'</span>';
+  else if(dev==="atrium"&&d.m<0)mv=' <span class="mv dn">&darr;'+esc(d.t1)+'</span>';
+  return '<div class="trk"><div class="tt"><span class="t">'+esc(d.t)+'</span>'+
+    (d.l?' <span class="live">Live</span>':'')+mv+
+    (showMeta?'<div class="sm">'+esc(d.a)+' · '+esc(d.al)+'</div>':'')+
+    '</div><span class="tg" data-t="'+esc(t)+'">'+esc(t)+'</span>'+
+    '<span class="fmt" data-hi="'+(isHi(d.f)?1:0)+'">'+esc(d.f)+'</span>'+meter(d.c)+'</div>';
+}
+function albumsOf(rows){
+  const map=new Map();
+  rows.forEach(d=>{const k=d.al||"（无专辑）";if(!map.has(k))map.set(k,[]);map.get(k).push(d);});
+  return [...map.entries()].sort((x,y)=>y[1].length-x[1].length||COLL.compare(x[0],y[0]));
+}
+function entity(name,sub,rows,open,groupByAlbum){
+  const d=el('details','ent');if(open)d.open=true;
+  d.innerHTML='<summary><span class="ehead"><span class="ename">'+esc(name)+'</span>'+
+    (sub?' <span class="esub">'+esc(sub)+'</span>':'')+
+    '<div class="esub">'+profile(rows)+'</div></span>'+
+    '<span class="espan">'+tbar(rows)+'<span class="ecnt">'+rows.length+' 首</span></span></summary>';
+  const body=el('div','ebody');
+  if(groupByAlbum){
+    body.innerHTML=albumsOf(rows).map(function(p){
+      return '<div class="alb"><div class="albh"><span class="an">'+esc(p[0])+
+        '</span><span class="ac">'+p[1].length+' 首</span></div>'+
+        p[1].slice().sort(byName).map(x=>trk(x,false)).join('')+'</div>';}).join('');
+  }else{
+    body.innerHTML=rows.slice().sort(byName).map(x=>trk(x,false)).join('');
+  }
+  d.appendChild(body);return d;
+}
 
 function render(){
-  const m=M(), list=document.getElementById('list');
-  list.innerHTML=""; let shown=0;
-  for(const t of m.order){
-    if(activeTier!=="ALL"&&activeTier!==t) continue;
-    let rows=DATA.filter(d=>tierOf(d)===t && (!terms.length || hit(d)));
-    if(!rows.length) continue;
-    rows=rows.slice().sort(byName);
-    const sec=el('div','tier'); sec.dataset.t=t;
-    sec.appendChild(el('div','th',
-      `<span class="star">${m.star[t]}</span><span class="nm">${esc(t)}</span><span class="ds">${m.desc[t]}</span><span class="ct">${rows.length} 首</span>`));
-    for(const d of rows){
-      shown++;
-      let mv="";
-      if(dev==="atrium"&&d.m>0) mv=' <span class="mv up">↑ 升自 '+esc(d.t1)+'</span>';
-      else if(dev==="atrium"&&d.m<0) mv=' <span class="mv dn">↓ 原 '+esc(d.t1)+'</span>';
-      sec.appendChild(el('div','row',
-        `<div><span class="a">${esc(d.a)}</span> · <span class="t">${esc(d.t)}</span>${d.l?' <span class="live">Live</span>':''}${mv}<div class="al">${esc(d.al)}</div></div>`+
-        `<div class="meta">${esc(d.f)}${d.c!=null?`<span class="dr">DR ${d.c}</span>`:''}</div>`));
+  const m=M(),list=$('list');list.innerHTML="";
+  const rows=DATA.filter(d=>(activeTier==="ALL"||tierOf(d)===activeTier)&&(!terms.length||hit(d)));
+  const nArt=new Set(rows.map(d=>d.a)).size,nAlb=new Set(rows.map(d=>d.a+" / "+d.al)).size;
+  $('status').innerHTML='<b>'+rows.length+'</b> 首 · <b>'+nArt+'</b> 位艺人 · <b>'+nAlb+'</b> 张专辑';
+  $('dir').style.display=(view==="tier")?"none":"";
+  if(!rows.length){list.innerHTML='<div class="empty">没有匹配的歌曲。换个关键词，或点「全部」。</div>';return;}
+  if(view==="tier"){
+    for(const t of m.order){
+      const rs=rows.filter(d=>tierOf(d)===t);if(!rs.length)continue;
+      const sec=el('div','tier');sec.dataset.t=t;
+      sec.appendChild(el('div','th','<span class="star">'+m.star[t]+'</span><span class="nm">'+esc(t)+
+        '</span><span class="ds">'+m.desc[t]+'</span><span class="ct">'+rs.length+' 首</span>'));
+      sec.insertAdjacentHTML('beforeend',rs.slice().sort(byName).map(d=>
+        '<div class="trk"><div class="tt"><span class="t">'+esc(d.t)+'</span>'+(d.l?' <span class="live">Live</span>':'')+
+        '<div class="sm">'+esc(d.a)+' · '+esc(d.al)+'</div></div>'+
+        '<span class="fmt" data-hi="'+(isHi(d.f)?1:0)+'">'+esc(d.f)+'</span><span></span>'+meter(d.c)+'</div>').join(''));
+      list.appendChild(sec);
     }
-    list.appendChild(sec);
+    return;
   }
-  if(!shown) list.innerHTML='<div class="empty">没有匹配的歌曲。换个关键词，或点「全部」。</div>';
+  let groups=[];
+  if(view==="artist"){
+    const map=new Map();
+    rows.forEach(d=>{if(!map.has(d.a))map.set(d.a,[]);map.get(d.a).push(d);});
+    groups=[...map.entries()].map(p=>[p[0],"",p[1]]);
+    groups.sort((x,y)=>y[2].length-x[2].length||grp(x[0])-grp(y[0])||COLL.compare(x[0],y[0]));
+  }else{
+    const map=new Map();
+    rows.forEach(d=>{
+      let m2=map.get(d.a); if(!m2){m2=new Map();map.set(d.a,m2);}
+      const al=d.al||"（无专辑）";
+      if(!m2.has(al))m2.set(al,[]);
+      m2.get(al).push(d);});
+    for(const [a,m2] of map) for(const [al,rs] of m2) groups.push([al,a,rs]);
+    groups.sort((x,y)=>y[2].length-x[2].length||grp(x[1])-grp(y[1])||COLL.compare(x[1],y[1])||COLL.compare(x[0],y[0]));
+  }
+  const open=groups.length<=5;
+  const frag=document.createDocumentFragment();
+  groups.forEach(g=>frag.appendChild(entity(g[0],g[1],g[2],open,view==="artist")));
+  list.appendChild(frag);
 }
-buildChips(); paintGear(); render();
+function buildDir(){
+  const w=$('dirlist'),cnt=new Map();
+  DATA.forEach(d=>cnt.set(d.a,(cnt.get(d.a)||0)+1));
+  const arr=[...cnt.entries()].sort((x,y)=>grp(x[0])-grp(y[0])||COLL.compare(x[0],y[0]));
+  w.innerHTML=arr.map(p=>'<button type="button" data-a="'+esc(p[0])+'">'+esc(p[0])+'<i>'+p[1]+'</i></button>').join('');
+  w.onclick=function(e){const b=e.target.closest('button');if(!b)return;
+    $('q').value=b.dataset.a;terms=[b.dataset.a.toLowerCase()];
+    view="artist";[...$('views').children].forEach(x=>x.classList.toggle('on',x.dataset.v==="artist"));
+    activeTier="ALL";[...$('chips').children].forEach(x=>x.classList.toggle('on',x.dataset.t==="ALL"));
+    $('dir').open=false;render();window.scrollTo({top:0,behavior:'smooth'});};
+}
+buildChips();paintGear();buildDir();render();
 </script></body></html>
