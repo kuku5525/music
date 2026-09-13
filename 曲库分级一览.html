@@ -139,8 +139,8 @@ display:flex;align-items:baseline;gap:9px;font-weight:700;font-size:14.5px}
       <button type="button" data-v="tier" role="tab">按档位</button>
     </div>
     <div class="seg mini" id="asort" role="tablist" style="display:none">
-      <button type="button" data-s="y" class="on" role="tab">年代</button>
-      <button type="button" data-s="a" role="tab">艺人</button>
+      <button type="button" data-s="a" class="on" role="tab">艺人</button>
+      <button type="button" data-s="y" role="tab">年代</button>
       <button type="button" data-s="n" role="tab">曲数</button>
     </div>
     <div class="chips" id="chips"></div>
@@ -171,7 +171,7 @@ const LO=6,HI=24,LINE=11;
 const $=id=>document.getElementById(id);
 $('tot').textContent=TOTAL;
 
-let dev="traillii", view="artist", activeTier="ALL", terms=[], albSort="y";
+let dev="traillii", view="artist", activeTier="ALL", terms=[], albSort="a";
 const hay=d=>d._h||(d._h=(d.a+" "+d.t+" "+d.al+" "+d.f+" "+(d.l?"live 现场":"studio 录音室")+" dr"+(d.c==null?"":d.c)+
   " "+(d.k||"")+" "+(d.k&&ALBUMS[d.k]&&ALBUMS[d.k].y?ALBUMS[d.k].y:"")+" "+(d.sg||"")+
   " "+(d.k?"专辑 album":"散曲 single")).toLowerCase());
@@ -298,7 +298,8 @@ function renderAlbums(rows,list){
   let keys=[...amap.keys()];
   const M2=k=>ALBUMS[k]||{};
   if(albSort==="y")keys.sort((x,y)=>(M2(x).y||9999)-(M2(y).y||9999)||COLL.compare(M2(x).ar||'',M2(y).ar||''));
-  else if(albSort==="a")keys.sort((x,y)=>grp(M2(x).ar)-grp(M2(y).ar)||COLL.compare(M2(x).ar||'',M2(y).ar||'')||(M2(x).y||0)-(M2(y).y||0));
+  else if(albSort==="a")keys.sort((x,y)=>grp(M2(x).ar)-grp(M2(y).ar)||COLL.compare(M2(x).ar||'',M2(y).ar||'')||
+    (M2(x).y||0)-(M2(y).y||0)||COLL.compare(M2(x).ti||'',M2(y).ti||''));
   else keys.sort((x,y)=>amap.get(y).length-amap.get(x).length||COLL.compare(M2(x).ar||'',M2(y).ar||''));
   if(keys.length){
     const nt=keys.reduce((s,k)=>s+amap.get(k).length,0);
@@ -383,7 +384,7 @@ function render(){
     const map=new Map();
     rows.forEach(d=>{if(!map.has(d.a))map.set(d.a,[]);map.get(d.a).push(d);});
     groups=[...map.entries()].map(p=>[p[0],"",p[1]]);
-    groups.sort((x,y)=>y[2].length-x[2].length||grp(x[0])-grp(y[0])||COLL.compare(x[0],y[0]));
+    groups.sort((x,y)=>grp(x[0])-grp(y[0])||COLL.compare(x[0],y[0]));
   }
   const open=groups.length<=5;
   const frag=document.createDocumentFragment();
