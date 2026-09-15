@@ -120,8 +120,9 @@ width:34px;height:34px;font:inherit;font-size:14px;cursor:pointer;padding:0}
 padding:9px 13px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .fvtool button:hover{border-color:var(--gold)}
 .fvtool button.warn{color:var(--warn)}
-.code{width:100%;min-height:88px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
+.code{position:absolute;left:-9999px;width:100%;min-height:88px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
 padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--ink);resize:vertical}
+.code.show{position:static;left:auto}
 .note{color:var(--ink2);font-size:12.5px;line-height:1.7;margin:8px 0}
 .note b{color:var(--gold)}
 .empty{padding:40px 8px;text-align:center;color:var(--ink2)}
@@ -388,14 +389,11 @@ function renderFav(){
   $('sum').innerHTML='\u2665 我的收藏 <b>'+fav.length+'</b> 首'+
     (favDirty?' · <b>有改动没同步</b>':' · 与卡上一致');
   const tool=el('div','fvtool');
-  tool.innerHTML='<button data-act="copy">复制同步码</button>'+
-    '<button data-act="paste">粘贴同步码</button>'+
-    (favDirty?'<button data-act="revert">丢弃本地改动</button>':'')+
+  tool.innerHTML='<button data-act="copy">复制清单</button>'+
     (fav.length?'<button class="warn" data-act="clear">清空</button>':'');
   list.appendChild(tool);
-  const note=el('div','note','把<b>同步码</b>复制给 Claude，下次连墨菊时会拷进卡上的 '+
-    '<b>00 Playlist / 00 My Favorite</b>，文件名 <b>001-歌手-歌名.flac</b>，顺序就是下面这个顺序。'+
-    '曲库本身不动。');
+  const note=el('div','note','点「复制清单」再跟 Claude 说一声，就会拷进墨菊的 '+
+    '<b>00 Playlist / 00 My Favorite</b>，顺序就是下面这个顺序。曲库本身不动。');
   list.appendChild(note);
   const ta=el('textarea','code');ta.id='favcode';ta.value=syncCode();ta.readOnly=true;
   list.appendChild(ta);
@@ -447,24 +445,14 @@ $('list').addEventListener('click',function(e){
   const act=b.dataset.act;
   if(act==="copy"){
     const code=syncCode(),ta=$('favcode');
-    ta.readOnly=false;ta.value=code;ta.select();
+    ta.readOnly=false;ta.value=code;ta.select();ta.setSelectionRange(0,code.length);
     let ok=false;try{ok=document.execCommand('copy');}catch(err){}
     ta.readOnly=true;
+    const good=()=>favMsg('已复制 '+fav.length+' 首，跟 Claude 说一声就行。');
+    const bad=()=>{ta.classList.add('show');favMsg('复制没成功 —— 长按下面的框全选复制。');};
     if(navigator.clipboard&&navigator.clipboard.writeText)
-      navigator.clipboard.writeText(code).then(()=>favMsg('已复制同步码，粘给 Claude 就行。'),
-        ()=>favMsg(ok?'已复制同步码。':'复制不了就长按上面的框全选复制。'));
-    else favMsg(ok?'已复制同步码。':'长按上面的框全选复制。');
-  }else if(act==="paste"){
-    const ta=$('favcode');ta.readOnly=false;ta.value="";ta.placeholder="把同步码粘到这里，然后点「确认导入」";ta.focus();
-    favMsg('<button data-act="doimport" style="font:inherit;font-weight:700;color:var(--gold);'+
-      'background:transparent;border:0;cursor:pointer;padding:0">确认导入</button>');
-  }else if(act==="doimport"){
-    try{const o=JSON.parse($('favcode').value);
-      if(!o||!Array.isArray(o.list))throw 0;
-      setFav(o.list);render();favMsg('导入了 '+fav.length+' 首。');
-    }catch(err){favMsg('这段同步码看不懂，检查一下有没有粘全。');}
-  }else if(act==="revert"){
-    setFav(FAV0);render();favMsg('已回到与卡上一致的版本。');
+      navigator.clipboard.writeText(code).then(good,()=>{ok?good():bad();});
+    else ok?good():bad();
   }else if(act==="clear"){
     if(confirm('清空收藏？'))
       {setFav([]);render();}
