@@ -60,7 +60,7 @@ border:1px solid var(--live-bd);vertical-align:2px;white-space:nowrap}
 .tbr{display:flex;height:7px;border-radius:2px;overflow:hidden;border:1px solid var(--line)}
 /* ── 曲目 ── */
 .abody{padding:2px 2px 12px}
-.tk{display:grid;grid-template-columns:40px 1fr auto 122px 28px;gap:10px;align-items:center;padding:7px 0;border-top:1px dashed var(--line)}
+.tk{display:grid;grid-template-columns:26px 38px 1fr auto 122px;gap:10px;align-items:center;padding:7px 0;border-top:1px dashed var(--line)}
 .tk:first-child{border-top:0}
 .no{color:var(--ink2);font-size:12px;text-align:right;opacity:.85}
 .tt{min-width:0}
@@ -90,9 +90,12 @@ box-shadow:0 0 0 1px rgba(0,0,0,.08)}
 padding:11px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
 .favbtn.on{border-color:var(--gold);color:var(--gold)}
 .favbtn b{color:var(--ink)}
-button.fav{appearance:none;border:0;background:transparent;color:var(--ink2);opacity:.4;font-size:15px;line-height:1;
-cursor:pointer;padding:5px;border-radius:6px;justify-self:end}
+button.fav{appearance:none;border:0;background:transparent;color:var(--ink2);opacity:.4;line-height:0;
+cursor:pointer;padding:4px;border-radius:6px;justify-self:center}
+button.fav svg{display:block;width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;
+stroke-linejoin:round}
 button.fav[aria-pressed="true"]{color:#c8524a;opacity:1}
+button.fav[aria-pressed="true"] svg{fill:currentColor}
 button.fav:hover{opacity:.95}
 @media(prefers-color-scheme:dark){button.fav[aria-pressed="true"]{color:#e0736a}}
 /* ── 我的收藏 ── */
@@ -136,11 +139,12 @@ padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--pan
   .at{font-size:16px}
   .aspan{margin-left:77px;width:calc(100% - 77px);gap:9px}
   .tb2{width:108px}
-  .tk{grid-template-columns:30px minmax(0,1fr) 74px 26px;row-gap:4px;gap:7px}
-  .tk .tt{grid-column:2/4}
-  .tk .fav{grid-column:4/5;grid-row:1}
-  .tk .mt{grid-column:2/3}
-  .tk .dr{grid-column:3/5}
+  .tk{grid-template-columns:24px 26px minmax(0,1fr) 74px;row-gap:4px;gap:7px}
+  .tk .fav{grid-column:1;grid-row:1}
+  .tk .no{grid-column:2;grid-row:1}
+  .tk .tt{grid-column:3/5;grid-row:1}
+  .tk .mt{grid-column:3/4;grid-row:2}
+  .tk .dr{grid-column:4/5;grid-row:2}
   .fv{grid-template-columns:26px 44px minmax(0,1fr);gap:9px}
   .fv .fvb{grid-column:1/-1;justify-content:flex-end}
   .mt{justify-content:flex-start;gap:6px}
@@ -227,8 +231,7 @@ function toggleIdx(i){
   if(favSet.has(k))setFav(fav.filter(e=>kOf(e)!==k));
   else setFav(fav.concat([[d.a,d.t,d.l]]));
   document.querySelectorAll('button.fav[data-i="'+i+'"]').forEach(b=>{
-    b.setAttribute('aria-pressed',favSet.has(k)?'true':'false');
-    b.textContent=favSet.has(k)?'\u2665':'\u2661';});
+    b.setAttribute('aria-pressed',favSet.has(k)?'true':'false');});
   if(view==="fav")render();
 }
 const syncCode=()=>JSON.stringify({v:1,ts:new Date().toISOString().slice(0,19),n:fav.length,list:fav});
@@ -293,15 +296,19 @@ const trkn=n=>{const p=String(n||"").split("-");return +p[p.length-1]||999;};
 const byTrack=(x,y)=>{const a=numOf(x),b=numOf(y);
   return disc(a)-disc(b)||trkn(a)-trkn(b)||COLL.compare(x.t||'',y.t||'');};
 
+const HEART='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5'+
+  ' 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55'+
+  ' 11.54L12 21.35z"/></svg>';
 function trackRow(d){
-  return '<div class="tk"><span class="no">'+esc(numOf(d))+'</span>'+
+  return '<div class="tk">'+
+    '<button type="button" class="fav" data-i="'+d._i+'" aria-pressed="'+(favSet.has(KEYOF(d))?'true':'false')+
+      '" title="加入/移出我的收藏">'+HEART+'</button>'+
+    '<span class="no">'+esc(numOf(d))+'</span>'+
     '<div class="tt"><span class="t">'+hl(d.t)+'</span>'+(d.l?'<span class="live">Live</span>':'')+'</div>'+
     '<div class="mt"><span class="fmt" data-hi="'+(isHi(d.f)?1:0)+'">'+hl(d.f)+'</span>'+
       '<span class="tp"><i>Atrium</i><b'+tierHi("t2",d.t2)+' data-t="'+esc(d.t2)+'">'+esc(d.t2)+'</b></span>'+
       '<span class="tp"><i>朱鹂</i><b'+tierHi("t1",d.t1)+' data-t="'+esc(d.t1)+'">'+esc(d.t1)+'</b></span></div>'+
-    meter(d.c)+
-    '<button type="button" class="fav" data-i="'+d._i+'" aria-pressed="'+(favSet.has(KEYOF(d))?'true':'false')+
-      '" title="加入/移出我的收藏">'+(favSet.has(KEYOF(d))?'\u2665':'\u2661')+'</button></div>';
+    meter(d.c)+'</div>';
 }
 function ameta(k,rows){
   if(!isLoose(k))return ALBUMS[k]||{ti:k,ar:rows[0].a,y:null,kept:rows.length};
