@@ -310,7 +310,7 @@ function trackRow(d){
   return '<div class="tk"><span class="lead">'+
     '<button type="button" class="fav" data-i="'+d._i+'" aria-pressed="'+(favSet.has(KEYOF(d))?'true':'false')+
       '" title="加入/移出我的收藏">'+HEART+'</button>'+
-    '<span class="no">'+esc(numOf(d))+'</span></span>'+
+    (numOf(d)?'<span class="no">'+esc(numOf(d))+'</span>':'')+'</span>'+
     '<div class="tt"><span class="t">'+hl(d.t)+'</span>'+(d.l?'<span class="live">Live</span>':'')+'</div>'+
     '<div class="mt"><span class="dur">'+mmss(secOf(d))+'</span>'+
       '<span class="fmt" data-hi="'+(isHi(d.f)?1:0)+'">'+hl(d.f)+'</span>'+
