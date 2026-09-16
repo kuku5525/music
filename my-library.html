@@ -113,6 +113,9 @@ padding:8px 2px;border-bottom:1px solid var(--line)}
 .fv .ft{min-width:0}
 .fv .ft .n{font-size:14.5px}
 .fv .ft .s{color:var(--ink2);font-size:11.5px}
+.fv .ft .fq{display:flex;align-items:center;gap:10px;margin-top:5px;flex-wrap:wrap}
+.fv .ft .fq .fqf{font-size:11px;color:var(--ink2);white-space:nowrap}
+.fv .ft .fq .fqf[data-hi="1"]{color:var(--gold)}
 .fv.dead .ft .n{text-decoration:line-through;opacity:.6}
 .fvb{display:flex;gap:5px}
 .fvb button{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--ink2);border-radius:7px;
@@ -442,7 +445,10 @@ function renderFav(){
       '<span class="fc">'+(cid?CIMG(cid):'')+'</span>'+
       '<span class="ft"><div class="n">'+esc(e[1])+(e[2]?'<span class="live">Live</span>':'')+'</div>'+
       '<div class="s">'+esc(e[0])+(d&&d.al?' · '+esc(d.al):'')+
-        (d&&secOf(d)?' · '+mmss(secOf(d)):'')+(d?'':' · 库里已经没有这首了')+'</div></span>'+
+        (d&&secOf(d)?' · '+mmss(secOf(d)):'')+(d?'':' · 库里已经没有这首了')+'</div>'+
+      (d?'<div class="fq"><span class="tp"><i>Atrium</i><b'+tierHi("t2",d.t2)+' data-t="'+esc(d.t2)+'">'+esc(d.t2)+'</b></span>'+
+         '<span class="tp"><i>朱鹂</i><b'+tierHi("t1",d.t1)+' data-t="'+esc(d.t1)+'">'+esc(d.t1)+'</b></span>'+
+         '<span class="fqf" data-hi="'+(isHi(d.f)?1:0)+'">'+esc(d.f)+'</span></div>':'')+'</span>'+
       '<span class="fvb"><button data-mv="'+i+'" data-d="-1"'+(i?'':' disabled')+' title="上移">\u2191</button>'+
       '<button data-mv="'+i+'" data-d="1"'+(i<fav.length-1?'':' disabled')+' title="下移">\u2193</button>'+
       '<button data-rm="'+i+'" title="移出">\u2715</button></span>';
