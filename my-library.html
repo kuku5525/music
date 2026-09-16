@@ -128,6 +128,7 @@ padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--pan
 .code.show{position:static;left:auto}
 .note{color:var(--ink2);font-size:12.5px;line-height:1.7;margin:8px 0}
 .note b{color:var(--gold)}
+#list{overflow-anchor:none}   /* 重排后自己定位,别让浏览器的滚动锚定来抢 */
 .empty{padding:40px 8px;text-align:center;color:var(--ink2)}
 .foot{margin-top:34px;color:var(--ink2);font-size:12px;line-height:1.8;border-top:1px solid var(--line);padding-top:12px}
 .foot code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--ink)}
@@ -231,9 +232,24 @@ function loadFav(){
       if(o&&Array.isArray(o.list)){l=o.list;a=Array.isArray(o.artists)?o.artists:[];}}}catch(e){}
   setFav(l,a,false);
 }
+function anchorNow(){
+  /* 取视口顶部那个艺人块 + 它此刻离视口顶的距离 */
+  const bs=[...document.querySelectorAll('#list .art')];
+  for(const b of bs){const r=b.getBoundingClientRect();
+    if(r.bottom>0)return {a:b.dataset.a,top:r.top};}
+  return null;
+}
+function restoreAnchor(an){
+  if(!an)return;
+  const b=document.querySelector('#list .art[data-a="'+CSS.escape(an.a)+'"]');
+  if(!b)return;
+  const y=window.scrollY+b.getBoundingClientRect().top-an.top;
+  window.scrollTo(0,Math.max(0,Math.round(y)));
+}
 function toggleArtist(name){
+  const an=anchorNow();
   setFav(fav,favArtSet.has(name)?favArt.filter(x=>x!==name):favArt.concat([name]));
-  render();window.scrollTo({top:0,behavior:'smooth'});
+  render();restoreAnchor(an);
 }
 function paintFavBtn(){
   const b=$('favbtn');if(!b)return;
@@ -375,7 +391,8 @@ function albumCard(k,rows,open){
   d.appendChild(body);return d;
 }
 function artistBlock(name,rows,open){
-  const w=el('div','art'),amap=new Map();
+  const w=el('div','art');w.dataset.a=name;
+  const amap=new Map();
   const on=favArtSet.has(name);
   rows.forEach(d=>{const k=gkey(d);if(!amap.has(k))amap.set(k,[]);amap.get(k).push(d);});
   const mm=new Map([...amap.entries()].map(p=>[p[0],ameta(p[0],p[1])]));
