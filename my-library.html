@@ -231,7 +231,7 @@ function paintFavBtn(){
 function toggleIdx(i){
   const d=DATA[i],k=KEYOF(d);
   if(favSet.has(k))setFav(fav.filter(e=>kOf(e)!==k));
-  else setFav(fav.concat([[d.a,d.t,d.l]]));
+  else setFav([[d.a,d.t,d.l]].concat(fav));   /* 新加的排最前面,老的顺序不动 */
   document.querySelectorAll('button.fav[data-i="'+i+'"]').forEach(b=>{
     b.setAttribute('aria-pressed',favSet.has(k)?'true':'false');});
   if(view==="fav")render();
