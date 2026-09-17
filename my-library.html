@@ -75,6 +75,11 @@ border:1px solid var(--live-bd);vertical-align:2px;white-space:nowrap}
 .dur{font-size:11.5px;color:var(--ink2);white-space:nowrap;opacity:.85}
 .fmt{font-size:11.5px;color:var(--ink2);white-space:nowrap}
 .fmt[data-hi="1"]{color:var(--gold);font-weight:700}
+/* Hi-Res AUDIO 标识:只有 24bit 且 >=96kHz 的曲目才挂 */
+.hrl{display:inline-block;width:17px;height:17px;border-radius:2px;vertical-align:-4px;margin-right:5px}
+.asub .hrl{width:15px;height:15px;vertical-align:-3px;margin-right:4px}
+.asub .hifmt{color:var(--gold);font-weight:700}
+.mixn{color:var(--ink2);font-weight:400}
 .tp{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .tp i{font-style:normal;font-size:10.5px;color:var(--ink2);letter-spacing:.02em}
 .tp b{font-size:11.5px;font-weight:700;border-radius:5px;padding:2px 7px;color:#fff;min-width:26px;text-align:center}
@@ -115,7 +120,8 @@ padding:8px 2px;border-bottom:1px solid var(--line)}
 .fv .ft .s{color:var(--ink2);font-size:11.5px}
 .fv .ft .fq{display:flex;align-items:center;gap:10px;margin-top:5px;flex-wrap:wrap}
 .fv .ft .fq .fqf{font-size:11px;color:var(--ink2);white-space:nowrap}
-.fv .ft .fq .fqf[data-hi="1"]{color:var(--gold)}
+.fv .ft .fq .fqf[data-hi="1"]{color:var(--gold);font-weight:700}
+.fv .ft .fq .fqf .hrl{width:15px;height:15px;vertical-align:-3px;margin-right:4px}
 .fv.dead .ft .n{text-decoration:line-through;opacity:.6}
 .fvb{display:flex;gap:5px}
 .fvb button{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--ink2);border-radius:7px;
@@ -202,6 +208,15 @@ const TVAR={"S":"--s","A+":"--ap","A":"--a","R":"--r","B":"--b","C":"--c","Sound
 const LO=6,HI=24,LINE=11;
 const $=id=>document.getElementById(id);
 const isHi=f=>!!f&&!/^CD /.test(f);
+/* Hi-Res = 24bit 且 >=96kHz(JAS/RIAA 口径),对应库内 [HiRes …] 档 */
+const isHR=f=>/^HiRes /.test(f||"");
+/* 规格文字照 Qobuz 写法:24-Bit/96 kHz */
+const SRTXT={"44":"44.1","88":"88.2","176":"176.4"};
+function specTxt(f){const m=/^\S+\s+(\d+)-(\d+)$/.exec(f||"");
+  return m?m[1]+'-Bit/'+(SRTXT[m[2]]||m[2])+' kHz':(f||"");}
+const frank=f=>{const m=/(\d+)-(\d+)$/.exec(f||"");return m?(+m[1])*1e6+(+m[2]):0;};
+const HRLOGO='<img class="hrl" alt="Hi-Res AUDIO" title="Hi-Res AUDIO\uff0824bit / \u2265 96kHz\uff09" '+
+  'src="data:image/png;base64,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">';
 const CIMG=id=>'<img loading="lazy" decoding="async" alt="" src="covers/'+id+'.jpg">';
 let terms=[],qtier=[],view="lib";
 const S1=String.fromCharCode(1),S2=String.fromCharCode(2);   /* 拼 key 用的分隔符,收藏和分组都要 */
@@ -289,6 +304,14 @@ function hl(str){
   return out+esc(s.slice(pos));
 }
 const tierHi=(gear,t)=>qtier.some(q=>q.gear===gear&&q.t===t)?' class="hi"':'';
+/* 规格那格:命中的词可能是老写法(hires / 24-192),描在新写法上 */
+function hlF(f){
+  const s=specTxt(f),raw=(f||"").toLowerCase();
+  const ws=terms.filter(w=>w&&w[0]!=="-"&&!tierTerm(w));
+  if(ws.some(w=>raw.includes(w)&&!s.toLowerCase().includes(w)))return '<mark>'+esc(s)+'</mark>';
+  return hl(s);
+}
+const fmtHtml=f=>(isHR(f)?HRLOGO:'')+hlF(f);
 
 /* 不在 01 Albums/ 里的曲目:封面/年份/轨号查 COVERS.sgl(key 与 DATA 行同源:歌手+曲名+是否现场)，
    按 ALBUM 标签归成专辑,专辑 key 加个控制字符前缀,免得和 01 Albums/ 的夹名撞上 */
@@ -303,7 +326,7 @@ const isLoose=k=>k.charAt(0)===S2;
 const numOf=d=>d.n||SG(d).n||"";
 
 /* ── 搜索:语义原样(空格=且，-词=排除)，只多认 A:档 / Z:档 ── */
-const hay=d=>d._h||(d._h=(d.a+" "+d.t+" "+d.al+" "+d.f+" "+(d.l?"live 现场":"studio 录音室")+" dr"+(d.c==null?"":d.c)+
+const hay=d=>d._h||(d._h=(d.a+" "+d.t+" "+d.al+" "+d.f+" "+specTxt(d.f)+" "+(d.l?"live 现场":"studio 录音室")+" dr"+(d.c==null?"":d.c)+
   " "+(d.k||"")+" "+(d.k&&ALBUMS[d.k]&&ALBUMS[d.k].y?ALBUMS[d.k].y:(SG(d).y||""))+" "+(d.sg||"")).toLowerCase());
 const TRE=/^([az]|atrium|朱鹂)[:：](s|a\+|a|r|b|c|st|soundtest|试音)$/;
 const TNORM={"s":"S","a+":"A+","a":"A","r":"R","b":"B","c":"C","st":"SoundTest","soundtest":"SoundTest","试音":"SoundTest"};
@@ -347,7 +370,7 @@ function trackRow(d){
     (numOf(d)?'<span class="no">'+esc(numOf(d))+'</span>':'')+'</span>'+
     '<div class="tt"><span class="t">'+hl(d.t)+(d.s?'<span class="pick" title="以前自己挑着入过的版本">*</span>':'')+'</span>'+(d.l?'<span class="live">Live</span>':'')+'</div>'+
     '<div class="mt"><span class="dur">'+mmss(secOf(d))+'</span>'+
-      '<span class="fmt" data-hi="'+(isHi(d.f)?1:0)+'">'+hl(d.f)+'</span>'+
+      '<span class="fmt" data-hi="'+(isHR(d.f)?1:0)+'">'+fmtHtml(d.f)+'</span>'+
       '<span class="tp"><i>Atrium</i><b'+tierHi("t2",d.t2)+' data-t="'+esc(d.t2)+'">'+esc(d.t2)+'</b></span>'+
       '<span class="tp"><i>朱鹂</i><b'+tierHi("t1",d.t1)+' data-t="'+esc(d.t1)+'">'+esc(d.t1)+'</b></span></div>'+
     meter(d.c)+'</div>';
@@ -359,14 +382,16 @@ function ameta(k,rows){
           lv:rows.every(x=>x.l)?1:0,kept:rows.length,tot:null,loose:1};
 }
 function albSub(m,rows){
-  const fs=[...new Set(rows.map(d=>d.f))],hi=rows.filter(d=>isHi(d.f)).length,v=med(rows),bits=[];
+  const fs=[...new Set(rows.map(d=>d.f))],hi=rows.filter(d=>isHR(d.f)).length,v=med(rows),bits=[];
   if(m.y)bits.push(hl(m.y));
   bits.push(rows.length+' 首');
   const tsec=rows.reduce((a,d)=>a+secOf(d),0);
   if(tsec)bits.push(hhmm(tsec));
   const nd=new Set(rows.map(d=>disc(numOf(d)))).size;
   if(nd>1)bits.push('跨 '+nd+' 碟');
-  bits.push(fs.length===1?hl(fs[0]):'混合 '+hi+'/'+rows.length+' 高解析');
+  const bf=fs.slice().sort((x,y)=>frank(y)-frank(x))[0];
+  bits.push('<span class="'+(isHR(bf)?'hifmt':'')+'">'+fmtHtml(bf)+'</span>'+
+            (fs.length>1?'<span class="mixn"> 等 '+fs.length+' 种</span>':''));
   const live=rows.filter(d=>d.l).length;
   if(live&&!m.lv)bits.push('现场 '+live);
   if(v!=null)bits.push('DR 中位 '+v.toFixed(1));
@@ -414,10 +439,10 @@ function summary(rows,filtered){
   const nArt=new Set(rows.map(d=>d.a)).size;
   const nAlb=new Set(rows.map(gkey)).size;
   const live=rows.filter(d=>d.l).length;
-  const hi=rows.filter(d=>isHi(d.f)).length,v=med(rows);
+  const hi=rows.filter(d=>isHR(d.f)).length,v=med(rows);
   const tsec=rows.reduce((a,d)=>a+secOf(d),0);
   const bits=['<b>'+rows.length+'</b> 首','<b>'+nArt+'</b> 位艺人','<b>'+nAlb+'</b> 张专辑',
-              '现场 <b>'+live+'</b>','高解析 <b>'+(rows.length?Math.round(hi/rows.length*100):0)+'%</b>'];
+              '现场 <b>'+live+'</b>','Hi-Res <b>'+(rows.length?Math.round(hi/rows.length*100):0)+'%</b>'];
   if(tsec)bits.splice(1,0,'<b>'+hhmm(tsec)+'</b>');
   if(v!=null)bits.push('DR 中位 <b>'+v.toFixed(1)+'</b>');
   return (filtered?'匹配 ':'')+bits.join(' · ')+(filtered?'':'<span class="dt"> · 导出 2026-09-16</span>');
@@ -448,7 +473,7 @@ function renderFav(){
         (d&&secOf(d)?' · '+mmss(secOf(d)):'')+(d?'':' · 库里已经没有这首了')+'</div>'+
       (d?'<div class="fq"><span class="tp"><i>Atrium</i><b'+tierHi("t2",d.t2)+' data-t="'+esc(d.t2)+'">'+esc(d.t2)+'</b></span>'+
          '<span class="tp"><i>朱鹂</i><b'+tierHi("t1",d.t1)+' data-t="'+esc(d.t1)+'">'+esc(d.t1)+'</b></span>'+
-         '<span class="fqf" data-hi="'+(isHi(d.f)?1:0)+'">'+esc(d.f)+'</span></div>':'')+'</span>'+
+         '<span class="fqf" data-hi="'+(isHR(d.f)?1:0)+'">'+(isHR(d.f)?HRLOGO:'')+esc(specTxt(d.f))+'</span></div>':'')+'</span>'+
       '<span class="fvb"><button data-mv="'+i+'" data-d="-1"'+(i?'':' disabled')+' title="上移">\u2191</button>'+
       '<button data-mv="'+i+'" data-d="1"'+(i<fav.length-1?'':' disabled')+' title="下移">\u2193</button>'+
       '<button data-rm="'+i+'" title="移出">\u2715</button></span>';
