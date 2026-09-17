@@ -6,12 +6,12 @@
 :root{--bg:#f6f3ec;--panel:#fffdf8;--ink:#211d16;--ink2:#6b6153;--line:#e4dccb;--gold:#a9812f;
 --s:#a9812f;--ap:#b8722a;--a:#3f7a5f;--b:#4a6a86;--c:#9a6a63;--st:#7a6f9a;--r:#8a6f3f;
 --track:#eae2d2;--warn:#a8512a;--live-bg:rgba(31,111,106,.10);--live-fg:#25635f;--live-bd:rgba(31,111,106,.40);--mark:#ffd45e;--mark-fg:#241c07;
---sgl-bg:#c9bda2;--sgl-fg:#fffdf8;
+--sgl-bg:#c9bda2;--sgl-fg:#fffdf8;--hrg:#c08f0c;
 --safe-l:env(safe-area-inset-left,0px);--safe-r:env(safe-area-inset-right,0px)}
 @media(prefers-color-scheme:dark){:root{--bg:#131009;--panel:#1c1811;--ink:#efe7d6;--ink2:#a29882;--line:#2e2819;--gold:#d9b968;
 --s:#e0bd6f;--ap:#e0a05a;--a:#7cc39c;--b:#8bb3d6;--c:#d3928a;--st:#b0a3d6;--r:#c9a86a;
 --track:#2a2417;--warn:#e0925f;--live-bg:rgba(92,192,180,.13);--live-fg:#6fbcb2;--live-bd:rgba(92,192,180,.34);--mark:#d8a93c;--mark-fg:#191203;
---sgl-bg:#3a3222;--sgl-fg:#d9b968}}
+--sgl-bg:#3a3222;--sgl-fg:#d9b968;--hrg:#f5c518}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
@@ -74,11 +74,11 @@ border:1px solid var(--live-bd);vertical-align:2px;white-space:nowrap}
 .mt{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
 .dur{font-size:11.5px;color:var(--ink2);white-space:nowrap;opacity:.85}
 .fmt{font-size:11.5px;color:var(--ink2);white-space:nowrap}
-.fmt[data-hi="1"]{color:var(--gold);font-weight:700}
+.fmt[data-hi="1"]{color:var(--hrg)}
 /* Hi-Res AUDIO 标识:只有 24bit 且 >=96kHz 的曲目才挂 */
 .hrl{display:inline-block;width:17px;height:17px;border-radius:2px;vertical-align:-4px;margin-right:5px}
 .asub .hrl{width:15px;height:15px;vertical-align:-3px;margin-right:4px}
-.asub .hifmt{color:var(--gold);font-weight:700}
+.asub .hifmt{color:var(--hrg)}
 .mixn{color:var(--ink2);font-weight:400}
 .tp{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .tp i{font-style:normal;font-size:10.5px;color:var(--ink2);letter-spacing:.02em}
@@ -120,7 +120,7 @@ padding:8px 2px;border-bottom:1px solid var(--line)}
 .fv .ft .s{color:var(--ink2);font-size:11.5px}
 .fv .ft .fq{display:flex;align-items:center;gap:10px;margin-top:5px;flex-wrap:wrap}
 .fv .ft .fq .fqf{font-size:11px;color:var(--ink2);white-space:nowrap}
-.fv .ft .fq .fqf[data-hi="1"]{color:var(--gold);font-weight:700}
+.fv .ft .fq .fqf[data-hi="1"]{color:var(--hrg)}
 .fv .ft .fq .fqf .hrl{width:15px;height:15px;vertical-align:-3px;margin-right:4px}
 .fv.dead .ft .n{text-decoration:line-through;opacity:.6}
 .fvb{display:flex;gap:5px}
