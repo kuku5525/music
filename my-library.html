@@ -429,7 +429,8 @@ function artistBlock(name,rows,open){
   const on=favArtSet.has(name);
   rows.forEach(d=>{const k=gkey(d);if(!amap.has(k))amap.set(k,[]);amap.get(k).push(d);});
   const mm=new Map([...amap.entries()].map(p=>[p[0],ameta(p[0],p[1])]));
-  const keys=[...amap.keys()].sort((x,y)=>(mm.get(x).y||9999)-(mm.get(y).y||9999)||
+  /* 同一歌手下:年份【降序】(新的在前,无年份的垫底) → 专辑名字母/拼音升序 */
+  const keys=[...amap.keys()].sort((x,y)=>(mm.get(y).y||0)-(mm.get(x).y||0)||
     COLL.compare(mm.get(x).ti||x,mm.get(y).ti||y));
   w.appendChild(el('div','arth',
     '<button type="button" class="fav favart" data-a="'+esc(name)+'" aria-pressed="'+(on?'true':'false')+
