@@ -45,19 +45,22 @@ button.fav.favart svg{width:19px;height:19px}
 .arth .ac{color:var(--ink2);font-size:12.5px;white-space:nowrap;text-align:right}
 /* ── 专辑行 ── */
 .ab{border-bottom:1px solid var(--line)}
-.ab>summary{display:flex;gap:13px;align-items:center;padding:11px 2px;cursor:pointer;list-style:none;flex-wrap:wrap}
+.ab>summary{display:flex;gap:14px;align-items:flex-start;padding:12px 2px;cursor:pointer;list-style:none;flex-wrap:wrap}
 .ab>summary::-webkit-details-marker{display:none}
 .ab>summary:focus-visible{outline:2px solid var(--gold);outline-offset:-2px;border-radius:8px}
-.cvw{width:78px;height:78px;flex:none;border-radius:5px;overflow:hidden;background:var(--track);box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.cvw{width:104px;height:104px;flex:none;border-radius:5px;overflow:hidden;background:var(--track);box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .cvw img{width:100%;height:100%;display:block;object-fit:cover}
 .cvw.sgl{background:var(--sgl-bg);color:var(--sgl-fg);display:flex;align-items:center;justify-content:center;font-size:30px;line-height:1;box-shadow:none}
 .ah{min-width:0;flex:1 1 210px}
 .at{font-family:Georgia,"Songti SC",serif;font-size:17.5px;font-weight:700;letter-spacing:-.01em;line-height:1.35}
-.asub{color:var(--ink2);font-size:12.5px;margin-top:3px}
+.asub{font-size:12.5px;margin-top:6px;display:flex;flex-direction:column;gap:3px}
+.asub .am{display:flex;gap:10px;align-items:baseline;min-width:0}
+.asub .am>i{font-style:normal;color:var(--ink2);flex:none;width:4.5em;letter-spacing:.02em}
+.asub .am>span{color:var(--ink);min-width:0;overflow-wrap:anywhere}
 .live{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.11em;text-indent:.11em;text-transform:uppercase;border-radius:5px;
 padding:1px 7px;line-height:1.35;margin-left:6px;background:var(--live-bg);color:var(--live-fg);
 border:1px solid var(--live-bd);vertical-align:2px;white-space:nowrap}
-.aspan{margin-left:auto;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.aspan{margin-left:auto;align-self:center;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
 .badge{font-size:11.5px;font-weight:700;border-radius:5px;padding:3px 8px;border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
 .badge.full{background:var(--gold);color:#181205;border-color:transparent}
 .tb2{display:flex;flex-direction:column;gap:3px;width:124px;flex:none}
@@ -154,9 +157,10 @@ padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--pan
 @media(max-width:700px){
   .arth{grid-template-columns:auto 1fr}
   .arth .ac{grid-column:2;text-align:left}
-  .cvw{width:64px;height:64px}
+  .cvw{width:84px;height:84px}
   .at{font-size:16px}
-  .aspan{margin-left:77px;width:calc(100% - 77px);gap:9px}
+  .aspan{margin-left:98px;width:calc(100% - 98px);gap:9px}
+  .asub .am>i{width:4.2em}
   .tb2{width:108px}
   .ameta{grid-template-columns:1fr;gap:4px}
   .tk{grid-template-columns:50px minmax(0,1fr);row-gap:4px;gap:7px}
@@ -186,7 +190,7 @@ padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--pan
 数据源:本地库 tier_map.json · 分级为主观听音建议<br>
 每首歌右侧两个档位:<b>Atrium</b>=ZMF Atrium Open + Cayin HA-2A，<b>朱鹂</b>=墨菊 LPGT + Oriolus Traillii JP<br>
 搜索框可用 <code>A:A+</code> 查 Atrium 的 A+ 档、<code>Z:A</code> 查朱鹂的 A 档（可与别的词组合，如 <code>u2 A:A+</code>、<code>-Z:C</code>）<br>
-专辑行右边两条色带:上=Atrium，下=朱鹂；点开专辑，曲目上方是发行日期 / 厂牌 / 流派 / 提供规格<br>
+专辑行右边两条色带:上=Atrium，下=朱鹂；封面右边依次是发行日期 / 流派 / 曲目 / 提供规格<br>
 库里 <b>01 Albums/</b> 的整夹专辑标「整张 8 首」或「6/9 首」（原盘曲数暂未查证的只标数字）；
 其余曲目按各自的专辑标签归拢，只标收了几首，曲序按标签里的轨号
 <details class="lgd"><summary>档位说明</summary><div id="lgdbody"></div></details>
@@ -371,20 +375,24 @@ function ameta(k,rows){
   return {ti:rows[0].al||"未知专辑",ar:rows[0].a,y:ys.length?Math.min.apply(null,ys):null,
           lv:rows.every(x=>x.l)?1:0,kept:rows.length,tot:null,loose:1};
 }
-function albSub(m,rows){
-  const fs=[...new Set(rows.map(d=>d.f))],hi=rows.filter(d=>isHR(d.f)).length,bits=[];
-  if(m.y)bits.push(hl(m.y));
-  bits.push(rows.length+' 首');
+function albSub(m,rows,k){
+  const x=AMETA[k]||{},L=[];
+  const dt=x.d?fmtDate(x.d):(m.y?String(m.y):'');
+  if(dt)L.push(['发行日期',hl(dt)]);
+  if(x.g)L.push(['流派',esc(x.g)]);
   const tsec=rows.reduce((a,d)=>a+secOf(d),0);
-  if(tsec)bits.push(hhmm(tsec));
   const nd=new Set(rows.map(d=>disc(numOf(d)))).size;
-  if(nd>1)bits.push('跨 '+nd+' 碟');
-  const bf=fs.slice().sort((x,y)=>frank(y)-frank(x))[0];
-  bits.push('<span class="'+(isHR(bf)?'hifmt':'')+'">'+fmtHtml(bf)+'</span>'+
-            (fs.length>1?'<span class="mixn"> 等 '+fs.length+' 种</span>':''));
   const live=rows.filter(d=>d.l).length;
-  if(live&&!m.lv)bits.push('现场 '+live);
-  return bits.join(' · ');
+  let c=rows.length+' 首';
+  if(tsec)c+=' · '+hhmm(tsec);
+  if(nd>1)c+=' · 跨 '+nd+' 碟';
+  if(live&&!m.lv)c+=' · 现场 '+live;
+  L.push(['曲目',c]);
+  const fs=[...new Set(rows.map(d=>d.f))].sort((p,q)=>frank(q)-frank(p));
+  const ch=CHTXT[x.ch]||(x.ch?x.ch+' 声道':'');
+  L.push(['提供规格',fs.map(f=>'<span class="'+(isHR(f)?'hifmt':'')+'">'+fmtHtml(f)+'</span>').join('、')
+          +(ch?'、'+ch:'')]);
+  return L.map(p=>'<div class="am"><i>'+p[0]+'</i><span>'+p[1]+'</span></div>').join('');
 }
 function albBadge(m,shown){
   const kept=m.kept||shown,tot=m.tot;
@@ -393,41 +401,26 @@ function albBadge(m,shown){
   if(tot)return '<span class="badge">'+kept+'/'+tot+' 首</span>';
   return '<span class="badge">'+kept+' 首</span>';
 }
-/* 专辑详情块:照 Qobuz 专辑页头部的字段,中文 */
+/* 折叠行右侧字段:照 Qobuz 的写法,中文 */
 function fmtDate(s){
   const m=/^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?/.exec(s||"");
   if(!m)return esc(s||"");
   return m[3]?m[1]+'/'+m[2]+'/'+m[3]:(m[2]?m[1]+'/'+m[2]:m[1]);
 }
 const CHTXT={1:'单声道',2:'立体声',6:'5.1 环绕'};
-function ametaBlock(k,m,rows){
-  const x=AMETA[k]||{},b=[];
-  const dt=x.d?fmtDate(x.d):(m.y?String(m.y):'');
-  if(dt)b.push(['发行日期',dt]);
-  if(x.lb)b.push(['厂牌',esc(x.lb)]);
-  if(m.ar)b.push(['主要艺人',hl(m.ar)]);
-  if(x.g)b.push(['流派',esc(x.g)]);
-  const fs=[...new Set(rows.map(d=>d.f))].sort((p,q)=>frank(q)-frank(p));
-  const ch=CHTXT[x.ch]||(x.ch?x.ch+' 声道':'');
-  b.push(['提供规格',fs.map(f=>'<span class="'+(isHR(f)?'hifmt':'')+'">'+fmtHtml(f)+'</span>').join('、')
-           +(ch?'、'+ch:''),1]);
-  if(!b.length)return '';
-  return '<div class="ameta">'+b.map(p=>'<div class="am'+(p[2]?' wide':'')+'"><i>'+p[0]+
-    '</i><span>'+p[1]+'</span></div>').join('')+'</div>';
-}
 function albumCard(k,rows,open){
   const rs=rows.slice().sort(byTrack),m=ameta(k,rs);
   const cid=isLoose(k)?SG(rs[0]).c:COVERS.alb[k];
   const d=el('details','ab');if(open)d.open=true;
   const cov=cid?'<span class="cvw">'+CIMG(cid)+'</span>':'<span class="cvw sgl">♪</span>';
-  const miss=(m.kept&&rows.length<m.kept)?' <span class="fmt">命中 '+rows.length+'</span>':'';
+  const miss=(m.kept&&rows.length<m.kept)?'<div class="am"><i>命中</i><span>'+rows.length+' 首</span></div>':'';
   d.innerHTML='<summary>'+cov+
     '<span class="ah"><span class="at">'+hl(m.ti||k)+(m.lv?'<span class="live">Live</span>':'')+'</span>'+
-    '<div class="asub">'+albSub(m,rs)+miss+'</div></span>'+
+    '<div class="asub">'+albSub(m,rs,k)+miss+'</div></span>'+
     '<span class="aspan">'+albBadge(m,rows.length)+
     '<span class="tb2">'+tbar(rs,"t2","Atrium")+tbar(rs,"t1","朱鹂")+'</span></span></summary>';
   const body=el('div','abody');
-  body.innerHTML=ametaBlock(k,m,rs)+rs.map(trackRow).join('');
+  body.innerHTML=rs.map(trackRow).join('');
   d.appendChild(body);return d;
 }
 function artistBlock(name,rows,open){
