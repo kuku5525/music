@@ -21,6 +21,7 @@ h1{font-family:Georgia,"Songti SC",serif;font-size:clamp(25px,6vw,38px);margin:0
 .sum{color:var(--ink2);font-size:13px;margin-bottom:4px;line-height:1.6}
 .sum b{color:var(--ink);font-weight:700}
 .sum .dt{opacity:.75}
+.asub .reiss{color:var(--ink2);font-size:.92em}
 .bar{position:sticky;top:0;background:var(--bg);padding:11px 0 9px;z-index:5;border-bottom:1px solid var(--line);margin-top:10px}
 #q{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font-size:16px}
 #q:focus{outline:2px solid var(--gold);outline-offset:1px}
@@ -377,8 +378,15 @@ function ameta(k,rows){
 }
 function albSub(m,rows,k){
   const x=AMETA[k]||{},L=[];
-  const dt=x.d?fmtDate(x.d):(m.y?String(m.y):'');
-  if(dt)L.push(['发行日期',hl(dt)]);
+  /* 年份口径:排序用的是专辑夹年份(现场=演出年),标签里的 DATE 常是再版发行日。
+     两者一致才显示完整日期,不一致就以夹年份为准,再把真实发行年缀在后面 */
+  const dy=(x.d||'').slice(0,4);
+  let dt='',ex='',lb='发行日期';
+  if(m.y){
+    if(dy&&dy!==String(m.y)){dt=String(m.y);ex=' <span class="reiss">'+esc(dy)+' 发行</span>';lb='年份';}
+    else dt=x.d?fmtDate(x.d):String(m.y);
+  }else if(x.d)dt=fmtDate(x.d);
+  if(dt)L.push([lb,hl(dt)+ex]);
   if(x.g)L.push(['流派',esc(x.g)]);
   const tsec=rows.reduce((a,d)=>a+secOf(d),0);
   const nd=new Set(rows.map(d=>disc(numOf(d)))).size;
