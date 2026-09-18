@@ -208,8 +208,8 @@ const TVAR={"S":"--s","A+":"--ap","A":"--a","R":"--r","B":"--b","C":"--c","Sound
 const LO=6,HI=24,LINE=11;
 const $=id=>document.getElementById(id);
 const isHi=f=>!!f&&!/^CD /.test(f);
-/* Hi-Res = 24bit 且 >=96kHz(JAS/RIAA 口径),对应库内 [HiRes …] 档 */
-const isHR=f=>/^HiRes /.test(f||"");
+/* Hi-Res = 24bit 以上(Qobuz 口径:24-Bit/48 kHz 也挂 Hi-Res 标),即库内 [HiRes …] + [Hi24 …] */
+const isHR=f=>!!f&&!/^CD /.test(f);
 /* 规格文字照 Qobuz 写法:24-Bit/96 kHz */
 const SRTXT={"44":"44.1","88":"88.2","176":"176.4"};
 function specTxt(f){const m=/^\S+\s+(\d+)-(\d+)$/.exec(f||"");
