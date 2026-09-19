@@ -180,8 +180,8 @@ padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--pan
 .lyov{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;
 padding:calc(20px + env(safe-area-inset-top,0px)) 16px calc(20px + env(safe-area-inset-bottom,0px));-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .lyov[hidden]{display:none}
-.lybox{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:min(640px,100%);max-height:100%;
-display:flex;flex-direction:column;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.lybox{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:min(640px,100%);height:min(720px,100%);max-height:100%;
+display:flex;flex-direction:column;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.35)}  /* 高度定死 —— 歌词拉回来框不会从「载入中」的小块弹成整屏 */
 .lyhd{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:11px;align-items:center;
 padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
 .lyhd .lycv{width:56px;height:56px;border-radius:5px;overflow:hidden;background:var(--track);flex:none}
@@ -649,13 +649,13 @@ function openLy(d){
   $('lyti').innerHTML='<b>'+esc(d.t)+(d.l?'<span class="live">Live</span>':'')+'</b>'+
     '<i>'+esc(d.a)+(d.al?' · '+esc(d.al):'')+'</i>';
   $('lybd').className='lybd';$('lybd').innerHTML='<div class="empty">载入中…</div>';
-  $('lytog').style.display='none';
+  $('lytog').style.visibility='hidden';   /* 占位不收起 —— 按钮冒出来不会把标题挤一下 */
   $('lyov').hidden=false;document.body.style.overflow='hidden';
   lyShard(d.a).then(function(sh){
     if(lyCur!==d)return;
     const e=(sh==='ERR')?'ERR':(sh?sh[KEYOF(d)]:null);
     if(e&&e!=='ERR'&&e.g!=='zh'&&e.z){
-      const tg=$('lytog');tg.style.display='';tg.className='lytog'+(lyZh?' on':'');}
+      const tg=$('lytog');tg.style.visibility='';tg.className='lytog'+(lyZh?' on':'');}
     lyPaint(e);
   });
 }
