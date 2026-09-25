@@ -622,7 +622,7 @@ function lyShard(a){
   const id=LYRIDX[a];
   if(!id)return Promise.resolve(null);
   if(!LYCACHE.has(id))
-    LYCACHE.set(id,fetch('lyrics/'+id+'.json').then(r=>r.ok?r.json():'ERR').catch(()=>'ERR'));
+    LYCACHE.set(id,fetch('lyrics/'+id+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():'ERR').catch(()=>'ERR'));
   return LYCACHE.get(id);
 }
 function lyPaint(e){
